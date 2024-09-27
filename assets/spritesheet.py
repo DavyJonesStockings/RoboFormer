@@ -3,6 +3,12 @@
 import pygame
 
 class SpriteSheet:
+    '''
+    For full documentation of this module, visit GitHub:
+    https://github.com/DavyJonesStockings/Pygame_spritesheet
+
+    Make sure to read the license!
+    '''
 
     def __init__(self, filepath):
         """Load the sheet."""
@@ -13,11 +19,11 @@ class SpriteSheet:
             raise SystemExit(e)
 
 
-    def image_at(self, rectangle:tuple, colorkey:int = None, scale:int = 1) -> pygame.Surface:
+    def image_at(self, rectangle:tuple, scale:int = 1, colorkey:int = None) -> pygame.Surface:
         """Load a specific image from a specific rectangle.
         Returns a pygame surface.
         
-        rectangle: a tuple in the format of (x, y, width, height)
+        rectangle: a tuple in the format of (x, y, width, height). these are the dimensions for the image you want to load.
         colorkey: enter -1 to take the color code from (0,0) of the spritesheet,
         which will make all pixels of that exact color transparent. default 
         value leaves image as is
@@ -40,33 +46,37 @@ class SpriteSheet:
 
         return image
 
-    def images_at(self, rects:list, colorkey:int = None) -> list:
+    def images_at(self, rects:list, scale:int = 1, colorkey:int = None) -> list:
         """Load a whole bunch of images and return them as a list.
         
         rects: a list filled with rectangle tuples. see image_at() function
         for details on rectangle tuple format
+        scale: see image_at()
         colorkey: see image_at()
         """
-        return [self.image_at(rect, colorkey) for rect in rects]
+        return [self.image_at(rect, scale, colorkey) for rect in rects]
 
-    def load_horizontal_strip(self, rect, image_count, colorkey = None) -> list:
+    def load_row(self, rect:tuple, image_count:int, scale:int = 1,colorkey:int = None) -> list:
         """Load a whole strip of images, and return them as a list.
         This function assumes equal size of each image within the row.
-        rect:
+
+        rect: see image_at() for definition. This will be the first `rect` from which the positions of other sprites are derived.
+        image_count: 
+        scale: see image_at()
+        colorkey: see image_at()
         """
 
         # rect: (x, y, width, height)
         tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
                 for x in range(image_count)]
-        return self.images_at(tups, colorkey)
+        return self.images_at(tups, scale, colorkey)
 
-    def load_vertical_strip(self, rect, image_count, colorkey = None) -> list:
+    def load_column(self, rect:tuple, image_count:int, scale:int = 1, colorkey:int = None) -> list:
         """Load a whole strip of images, and return them as a list.
         This function assumes equal size of each image within the column.
-        rect:
         """
 
         # rect: (x, y, width, height)
         tups = [(rect[0], rect[1]+rect[3]*x, rect[2], rect[3])
                 for x in range(image_count)]
-        return self.images_at(tups, colorkey)
+        return self.images_at(tups,scale, colorkey)
