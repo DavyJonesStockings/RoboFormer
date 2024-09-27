@@ -4,6 +4,8 @@ import pyautogui
 from functools import wraps
 from pygame.locals import K_w,K_a,K_s,K_d
 
+from spritesheet import SpriteSheet
+
 # basic setup
 
 clock = pygame.time.Clock()
@@ -19,11 +21,13 @@ font = pygame.font.SysFont("calibri",32)
 screen = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 
 METER = 32
+robot_sheet = SpriteSheet("assets/graphics/robot/roboformerSpritesheet.png")
+animation_cache = {
+    "robot":robot_sheet.load_row((0,0,8,8), 3, 4)
+}
 
 # standard memoization function
-
 memoization_cache = {}
-
 def memoize(func):
     '''memoization decorator to optimize functions.
     functions must have a return value for this to apply.'''
@@ -41,6 +45,7 @@ class Robot(pygame.sprite.Sprite):
     def __init__(self, dimensions:tuple) -> None:
         super().__init__()
         self.rect = pygame.Rect((WIDTH/2, HEIGHT/2), (dimensions[0], dimensions[1]))
+        self.img = animation_cache["robot"][0]
         
         self.pos = vec(WIDTH/2, HEIGHT/2)
         self.vel = vec(0,0)
@@ -50,6 +55,7 @@ class Robot(pygame.sprite.Sprite):
         
         pressed_keys = pygame.key.get_pressed()
 
+        # vertical movement
         if pressed_keys[K_w]:
             self.vel.y = -SPEED
         elif pressed_keys[K_s]:
@@ -57,6 +63,7 @@ class Robot(pygame.sprite.Sprite):
         else:
             self.vel.y = 0
 
+        # horizontal movement
         if pressed_keys[K_a]:
             self.vel.x = -SPEED
         elif pressed_keys[K_d]:
@@ -81,9 +88,13 @@ class Robot(pygame.sprite.Sprite):
 
         self.rect.midbottom = self.pos
 
+    def draw(self, s):
+        s.blit(self.img)
 
 char = Robot((1*METER, 3*METER))
 
+
+print(animation_cache["robot"])
 
 RUNNING = True
 while RUNNING:
@@ -96,6 +107,7 @@ while RUNNING:
     screen.fill((0,0,0))
 
     char.move()
+    screen.blit(char.img, screen)
 
     pygame.draw.rect(screen, (255,255,255), char.rect)
     pygame.display.flip()
